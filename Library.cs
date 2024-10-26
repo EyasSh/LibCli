@@ -2,9 +2,12 @@
 
 namespace Library;
 
+/// <summary>
+/// a class Representing a library. This class is a singleton
+/// </summary>
 public class Library
     {
-        private static Library? _lib=Library.GetInstance();
+        static Library? _lib=Library.GetInstance();
         List<Worker?> _workers = new();
         List<Book?> _books = new();
         
@@ -12,6 +15,10 @@ public class Library
         {
             _workers.Add(a);
         }
+        /// <summary>
+        /// a public method to return an instance of the <see cref="Library"/> class 
+        /// </summary>
+        /// <returns> A singleton instance of the class</returns>
         public static Library GetInstance()
         {
 
@@ -25,11 +32,14 @@ public class Library
             }
             return _lib;
         }
+        /// <summary>
+        /// a method that checks if a <see cref="Worker"/> objects exists in the worker list of the library
+        /// </summary>
+        /// <param name="worker">The worker being checked</param>
+        /// <returns>true if a worker does work at the library and false otherwise</returns>
         public bool WorksAtLib(Worker? worker)
         {
-            if (_workers.Contains(worker))
-                return true;
-            return false;
+           return _workers.Contains(worker);
         }
         public void AddBook(Worker? w, Book? book)
         {
@@ -47,6 +57,12 @@ public class Library
 
 
         }
+        /// <summary>
+        /// Removes a book given that it exists in the list
+        /// if it doesn't the method prints a message with an exception
+        /// </summary>
+        /// <param name="worker"> a worker working in the library</param>
+        /// <param name="book">the book to be removed</param>
         public void RemoveBook(Worker? worker, Book? book)
         {
             if (book == null || worker == null)
@@ -55,6 +71,11 @@ public class Library
             }
             else
             {
+                if (!WorksAtLib(worker))
+                {
+                    MessageHandler.FailureMsg($"{worker.Name} Does Not Work at the Library");
+                    return;
+                }
                 try
                 {
                     _books.Remove(book);
@@ -67,6 +88,11 @@ public class Library
 
             }
         }
+        /// <summary>
+        /// This method enables a <see cref="Manager"/> position or above to hire a new worker
+        /// </summary>
+        /// <param name="adder">The <see cref="Manager"/> or <see cref="Admin"/> which is hiring the worker</param>
+        /// <param name="worker">The <see cref="Worker"/> being hired</param>
         public void AddWorker(Manager? adder, Worker? worker)
         {
             if (adder!=null && worker!=null && WorksAtLib(adder))
@@ -79,6 +105,11 @@ public class Library
                 MessageHandler.FailureMsg(@"Failure to add worker either the adder or the worker are null or 
                                           the adder does not work at lib");
         }
+        /// <summary>
+        /// a method to  fire a <see cref="Worker"/>
+        /// </summary>
+        /// <param name="remover">an <see cref="Admin"/> who is firing the worker</param>
+        /// <param name="worker"> The <see cref="Worker"/> Being  fired</param>
         public void RemoveWorker(Admin? remover, Worker? worker)
         {
             if ((worker != null && remover != null) && (WorksAtLib(remover) && WorksAtLib(worker)))
@@ -90,6 +121,11 @@ public class Library
             else
                 MessageHandler.FailureMsg("Failure to remove worker");
         }
+        /// <summary>
+        /// A method to promote a worker
+        /// </summary>
+        /// <param name="admin"> an <see cref="Admin"/> whom works at the library which is promoting the worker</param>
+        /// <param name="worker"> The <see cref="Worker"/> being promoted</param>
         public void PromoteWorker(Admin admin, Worker? worker)
         {
             Console.WriteLine("Press 1 to promote worker to Manager" +
@@ -119,15 +155,18 @@ public class Library
                     }
                     break;
                 default:
-                    MessageHandler.FailureMsg("Wrong character pressed/ null admin or worker");
+                    MessageHandler.FailureMsg("Wrong character pressed/ null admin or worker/ worker being promoted is already in admin position");
                     break;
 
 
             }
         }
           ///
-         ///<Summary> @param admin an admin whose job is to demote a worker </Summary>
-         ///
+         ///<summary>
+         /// a method the job of which is demote a worker to a lower position within the library
+         /// </summary>
+         /// <param name="admin"> an <see cref="Admin"/> who is demoting the worker</param>
+         ///<param name="worker">a <see cref="Worker"/> object which represents the worker being demoted</param>
         public void DemoteWorker(Admin? admin, Worker? worker)
         {
             bool bothWorkAtLib = (admin != null && worker != null) && _lib is not null && (_lib.WorksAtLib(admin) && _lib.WorksAtLib(worker));
